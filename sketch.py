@@ -9,17 +9,15 @@ json_data = open('./config.json')
 config = json.load(json_data)
 json_data.close()
 
-# screensize = [800, 600]
-screensize = [config["screen"]["width"], config["screen"]["height"]]
-cursor_pos = [screensize[0] / 2, screensize[1] / 2]
-cursor_size = 10
-shake_alpha = (255 / 100) * 5
+shake_alpha = (255 / 100) * config["screen"]["shake_alpha_perc"]
 shake_amount = 1
-start_full_screen = (config["screen"]["fullscreen"])
 
 
 def pixel(surface, color, pos):
-    surface.fill(color, (pos, (cursor_size, cursor_size)))
+    if config["cursor"]["style"] == "square":
+        surface.fill(color, (pos, (config["cursor"]["height"], config["cursor"]["width"])))
+    elif config["cursor"]["style"] == "circle":
+        pygame.draw.circle(surface, color, pos, config["cursor"]["width"])
 
 
 def toggle_fullscreen():

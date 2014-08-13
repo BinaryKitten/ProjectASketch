@@ -1,13 +1,19 @@
 {
     "process": "keyboard",
     "screen": {
-        "fullscreen": 0,
+        "fullscreen": 1,
         "width": 1024,
-        "height": 768
+        "height": 768,
+        "shake_alpha_perc": 10
     },
     "serial": {
         "port": "/dev/ttyACM0",
         "baud": 14400,
         "timeout": 0.5
+    },
+    "cursor": {
+        "style": "circle",
+        "height": 10,
+        "width": 10
     }
 }
