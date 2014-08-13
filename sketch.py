@@ -10,7 +10,7 @@ config = json.load(json_data)
 json_data.close()
 
 # screensize = [800, 600]
-screensize = [config["screen"]["height"], config["screen"]["width"]]
+screensize = [config["screen"]["width"], config["screen"]["height"]]
 cursor_pos = [screensize[0] / 2, screensize[1] / 2]
 cursor_size = 10
 shake_alpha = (255 / 100) * 5
@@ -162,6 +162,19 @@ def run_game_loop():
             project_a_sketch(pressed)
             pygame.time.wait(50)
 
+def calculate_screen():
+    global screensize, cusor_pos, screen
+
+    if config["screen"]["fullscreen"] == 1:
+        screenData = pygame.display.Info()
+        screensize = [screenData.current_w, screenData.current_h]
+        screen = pygame.display.set_mode(screensize, pygame.FULLSCREEN)
+    else:
+        screensize = [config["screen"]["width"], config["screen"]["height"]]
+        screen = pygame.display.set_mode(screensize)
+
+    cursor_pos = [screensize[0] / 2, screensize[1] / 2]
+
 
 def main():
     global font, screen
@@ -169,14 +182,7 @@ def main():
     pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
-
-    screenData = pygame.display.Info()
-    print
-
-    if start_full_screen == 1:
-        screen = pygame.display.set_mode(screensize, pygame.FULLSCREEN)
-    else:
-        screen = pygame.display.set_mode(screensize)
+    calculate_screen()
     pygame.display.set_caption('Project a Sketch')
     pygame.event.set_allowed(pygame.KEYDOWN)
     screen.fill((255, 255, 255))
