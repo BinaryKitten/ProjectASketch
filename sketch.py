@@ -1,13 +1,21 @@
 __author__ = 'Kathryn Reeve'
 import serial
 import pygame
-import os
+import random
+import json
 
-screensize = [800, 600]
+json_data = open('./config.json')
+config = json.load(json_data)
+json_data.close()
+
+# screensize = [800, 600]
+screensize = [config["screen"]["height"], config["screen"]["height"]]
 cursor_pos = [screensize[0] / 2, screensize[1] / 2]
 cursor_size = 10
 shake_alpha = (255 / 100) * 5
 shake_amount = 1
+use_serial = (config["process"] == "serial")
+start_full_screen = (config["screen"]["fullscreen"])
 
 
 def pixel(surface, color, pos):
@@ -48,25 +56,25 @@ def project_a_sketch(pressed):
     render_pixel = False
     render_shake = False
 
-    if 1 in (pressed[pygame.K_DOWN], pressed[pygame.K_d]):
+    if 1 == pressed[pygame.K_DOWN]:
         cursor_pos[1] += cursor_size
         render_pixel = True
         if cursor_pos[1] >= screensize[1] - cursor_size:
             cursor_pos[1] = screensize[1] - cursor_size
 
-    if 1 in (pressed[pygame.K_UP], pressed[pygame.K_u]):
+    if 1 == pressed[pygame.K_UP]:
         cursor_pos[1] -= cursor_size
         render_pixel = True
         if cursor_pos[1] < 0:
             cursor_pos[1] = 0
 
-    if 1 in (pressed[pygame.K_LEFT], pressed[pygame.K_l]):
+    if 1 == pressed[pygame.K_LEFT]:
         cursor_pos[0] -= cursor_size
         render_pixel = True
         if cursor_pos[0] < 0:
             cursor_pos[0] = 0
 
-    if 1 in (pressed[pygame.K_RIGHT], pressed[pygame.K_r]):
+    if 1 == pressed[pygame.K_RIGHT]:
         cursor_pos[0] += cursor_size
         render_pixel = True
         if cursor_pos[0] >= screensize[0] - cursor_size:
@@ -87,10 +95,10 @@ def project_a_sketch(pressed):
 
     if render_pixel or render_shake:
         pygame.display.flip()
-        pygame.time.wait(50)
 
 
 def run_game_loop():
+    global use_serial
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -101,15 +109,27 @@ def run_game_loop():
                 return
             elif event.type == pygame.KEYDOWN and event.key in [pygame.K_ESCAPE, pygame.K_q]:
                 return
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
+                use_serial = not use_serial
 
-        if os.environ.get("PAS_SERIAL", 0) == 1:
+        if use_serial:
             # pressed = array thingy
             # build using the standard keys
-            pressed = []
+
+            pressed = {
+                pygame.K_UP: random.randrange(2),
+                pygame.K_DOWN: random.randrange(2),
+                pygame.K_LEFT: random.randrange(2),
+                pygame.K_RIGHT: random.randrange(2),
+                pygame.K_s: pygame.key.get_pressed()[pygame.K_s]
+            }
+            project_a_sketch(pressed)
+            pygame.time.wait(10)
+
         else:
             pressed = pygame.key.get_pressed()
-
-        project_a_sketch(pressed)
+            project_a_sketch(pressed)
+            pygame.time.wait(50)
 
 
 def run_game_loop_serial():
@@ -121,9 +141,13 @@ def run_game_loop_serial():
 def main():
     global font, screen
     pygame.init()
+    pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
-    screen = pygame.display.set_mode(screensize)
+    if start_full_screen == 1:
+        screen = pygame.display.set_mode(screensize, pygame.FULLSCREEN)
+    else:
+        screen = pygame.display.set_mode(screensize)
     pygame.display.set_caption('Project a Sketch')
     pygame.event.set_allowed(pygame.KEYDOWN)
     screen.fill((255, 255, 255))
