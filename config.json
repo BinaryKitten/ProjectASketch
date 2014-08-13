@@ -1,11 +1,11 @@
 {
-    "process": "keyboard",
+    "process": "random",
     "screen": {
         "fullscreen": 0,
-        "width": 1024,
-        "height": 768
+        "height": 1024,
+        "width": 768
     },
-    "serial" {
+    "serial": {
         "port": "/dev/ttyACM0",
         "baud": 14400,
         "timeout": 0.5

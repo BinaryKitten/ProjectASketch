@@ -171,6 +171,7 @@ def main():
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
 
     screenData = pygame.display.Info()
+    print
 
     if start_full_screen == 1:
         screen = pygame.display.set_mode(screensize, pygame.FULLSCREEN)
