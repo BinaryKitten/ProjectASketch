@@ -3,18 +3,18 @@ import serial
 import pygame
 import random
 import json
+import serial
 
 json_data = open('./config.json')
 config = json.load(json_data)
 json_data.close()
 
 # screensize = [800, 600]
-screensize = [config["screen"]["height"], config["screen"]["height"]]
+screensize = [config["screen"]["height"], config["screen"]["width"]]
 cursor_pos = [screensize[0] / 2, screensize[1] / 2]
 cursor_size = 10
 shake_alpha = (255 / 100) * 5
 shake_amount = 1
-use_serial = (config["process"] == "serial")
 start_full_screen = (config["screen"]["fullscreen"])
 
 
@@ -100,6 +100,9 @@ def project_a_sketch(pressed):
 def run_game_loop():
     global use_serial
     pygame.display.flip()
+    if config["process"] == "serial":
+        ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"], timeout=config["serial"]["timeout"])
+
     while True:
         for event in pygame.event.get():
             if event.type is pygame.KEYDOWN and (event.key == pygame.K_RETURN and (event.mod & (pygame.KMOD_LALT | pygame.KMOD_RALT)) != 0):
@@ -112,10 +115,38 @@ def run_game_loop():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
                 use_serial = not use_serial
 
-        if use_serial:
+        if config["process"] == "serial":
             # pressed = array thingy
             # build using the standard keys
+            serial_line = ser.readline().strip()
 
+            pressed = {
+                pygame.K_UP: 0,
+                pygame.K_DOWN: 0,
+                pygame.K_LEFT: 0,
+                pygame.K_RIGHT: 0,
+                pygame.K_s: 0
+            }
+
+            if not serial_line:
+                pass
+
+            elif serial_line == 'u':
+                pressed[pygame.K_UP] = 1
+
+            elif serial_line == 'd':
+                pressed[pygame.K_DOWN] = 1
+
+            elif serial_line == 'l':
+                pressed[pygame.K_LEFT] = 1
+
+            elif serial_line == 'r':
+                pressed[pygame.K_RIGHT] = 1
+
+            project_a_sketch(pressed)
+            pygame.time.wait(10)
+
+        elif config["process"] == "random":
             pressed = {
                 pygame.K_UP: random.randrange(2),
                 pygame.K_DOWN: random.randrange(2),
@@ -132,18 +163,15 @@ def run_game_loop():
             pygame.time.wait(50)
 
 
-def run_game_loop_serial():
-    port = "COM5"
-    ser = serial.Serial(port, 115200)
-    pass
-
-
 def main():
     global font, screen
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
+
+    screenData = pygame.display.Info()
+
     if start_full_screen == 1:
         screen = pygame.display.set_mode(screensize, pygame.FULLSCREEN)
     else:
