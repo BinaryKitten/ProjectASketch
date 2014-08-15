@@ -3,7 +3,6 @@ import serial
 import pygame
 import random
 import json
-import serial
 
 json_data = open('./config.json')
 config = json.load(json_data)
@@ -11,6 +10,12 @@ json_data.close()
 
 shake_alpha = (255 / 100) * config["screen"]["shake_alpha_perc"]
 shake_amount = 1
+screensize = [0, 0]
+cursor_pos = [0, 0]
+screen = False
+cursor_size = 5
+yreads = []
+last_y_avg = 0
 
 
 def pixel(surface, color, pos):
@@ -96,10 +101,14 @@ def project_a_sketch(pressed):
 
 
 def run_game_loop():
-    global use_serial
+    global use_serial, last_y_avg, yreads
     pygame.display.flip()
     if config["process"] == "serial":
-        ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"], timeout=config["serial"]["timeout"])
+        ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"])
+        ser.close()
+        ser.open()
+        serial_line = ser.readline().strip()
+        print serial_line
 
     while True:
         for event in pygame.event.get():
@@ -110,8 +119,6 @@ def run_game_loop():
                 return
             elif event.type == pygame.KEYDOWN and event.key in [pygame.K_ESCAPE, pygame.K_q]:
                 return
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
-                use_serial = not use_serial
 
         if config["process"] == "serial":
             # pressed = array thingy
@@ -140,16 +147,30 @@ def run_game_loop():
 
             elif serial_line == 'r':
                 pressed[pygame.K_RIGHT] = 1
+            else:
+                x,y,z = serial_line.split()
+                ypos = int(y.split(":")[1])
+                yreads.append(ypos)
+                if len(yreads) > config['shake']['reads']:
+                    yreads.pop(0)
+
+                if len(yreads) == config['shake']['reads']:
+                    avg = sum(yreads) / config['shake']['reads']
+                    if last_y_avg == 0:
+                        last_y_avg = avg
+                    elif avg <= (last_y_avg - config['shake']['threshold']) | avg >= (last_y_avg + config['shake']['threshold']):
+                        pressed[pygame.K_s] = 1
+                        last_y_avg = avg
 
             project_a_sketch(pressed)
             pygame.time.wait(10)
 
         elif config["process"] == "random":
             pressed = {
-                pygame.K_UP: random.randrange(2),
-                pygame.K_DOWN: random.randrange(2),
-                pygame.K_LEFT: random.randrange(2),
-                pygame.K_RIGHT: random.randrange(2),
+                pygame.K_UP: (0, 1, 0, 1, 0, 1)[random.randrange(5)],
+                pygame.K_DOWN: (1, 0, 0, 1, 0, 1)[random.randrange(5)],
+                pygame.K_LEFT: (0, 1, 0, 0, 1, 1)[random.randrange(5)],
+                pygame.K_RIGHT: (1, 0, 1, 1, 0, 1)[random.randrange(5)],
                 pygame.K_s: pygame.key.get_pressed()[pygame.K_s]
             }
             project_a_sketch(pressed)
@@ -160,8 +181,9 @@ def run_game_loop():
             project_a_sketch(pressed)
             pygame.time.wait(50)
 
+
 def calculate_screen():
-    global screensize, cusor_pos, screen
+    global screensize, cursor_pos, screen
 
     if config["screen"]["fullscreen"] == 1:
         screenData = pygame.display.Info()

@@ -8,12 +8,16 @@
     },
     "serial": {
         "port": "/dev/ttyACM0",
-        "baud": 14400,
+        "baud": 115200,
         "timeout": 0.5
     },
     "cursor": {
         "style": "circle",
         "height": 10,
         "width": 10
+    },
+    "shake": {
+        "threshold": 1,
+        "reads": 3
     }
 }
