@@ -60,10 +60,9 @@ def project_a_sketch(pressed):
     render_shake = False
 
     if 1 == pressed[pygame.K_DOWN]:
-        cursor_pos[1] += cursor_size
-        render_pixel = True
-        if cursor_pos[1] >= screensize[1] - cursor_size:
-            cursor_pos[1] = screensize[1] - cursor_size
+        if cursor_pos[1] < screensize[1] - cursor_size:
+            render_pixel = True
+            cursor_pos[1] += cursor_size
 
     if 1 == pressed[pygame.K_UP]:
         cursor_pos[1] -= cursor_size
