@@ -170,7 +170,7 @@ def run_game_loop():
             pygame.time.wait(50)
 
 
-def calculate_screen():
+def setup_screen():
     global screensize, cursor_pos, screen
 
     if config["screen"]["fullscreen"] == 1:
@@ -180,21 +180,31 @@ def calculate_screen():
     else:
         screensize = [config["screen"]["width"], config["screen"]["height"]]
         screen = pygame.display.set_mode(screensize)
+        pygame.display.set_caption('Project a Sketch')
 
     cursor_pos = [screensize[0] / 2, screensize[1] / 2]
+    screen.fill((255, 255, 255))
+
+def setup_cursor():
+    pass
 
 
 def main():
     global font, screen
+    print "Project a Sketch - Start up"
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
-    calculate_screen()
-    pygame.display.set_caption('Project a Sketch')
-    pygame.event.set_allowed(pygame.KEYDOWN)
-    screen.fill((255, 255, 255))
+    print "Project a Sketch - Setting Screen"
+    setup_screen()
+
+    print "Project a Sketch - Setting only Key Down and Quit as allowed events"
+    pygame.event.set_allowed(pygame.KEYDOWN, pygame.QUIT)
+    print "Project a Sketch - Starting Sketch"
     run_game_loop()
+
+    print "Project a Sketch - Exiting System"
     pygame.quit()
     sys.exit()
 
