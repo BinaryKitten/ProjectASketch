@@ -192,20 +192,21 @@ def setup_cursor():
 
 def main():
     global font, screen
-    print "Project a Sketch - Start up"
+    sys.stderr.write("Project a Sketch - Start up")
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
-    print "Project a Sketch - Setting Screen"
+
+    sys.stderr.write("Project a Sketch - Setting Screen")
     setup_screen()
 
-    print "Project a Sketch - Setting only Key Down and Quit as allowed events"
+    sys.stderr.write("Project a Sketch - Setting only Key Down and Quit as allowed events")
     pygame.event.set_allowed([pygame.KEYDOWN, pygame.QUIT])
-    print "Project a Sketch - Starting Sketch"
+    sys.stderr.write("Project a Sketch - Starting Sketch")
     run_game_loop()
 
-    print "Project a Sketch - Exiting System"
+    sys.stderr.write("Project a Sketch - Exiting System")
     pygame.quit()
     sys.exit()
 
