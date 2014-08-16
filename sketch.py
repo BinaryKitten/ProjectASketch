@@ -25,7 +25,7 @@ def pixel(surface, color, pos):
         pygame.draw.circle(surface, color, pos, config["cursor"]["width"])
 
 
-def toggle_fullscreen():
+def toggle_full_screen():
     global screen
     tmp_screen = pygame.display.get_surface()
     tmp = tmp_screen.convert()
@@ -104,19 +104,15 @@ def run_game_loop():
     pygame.display.flip()
     if config["process"] == "serial":
         ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"])
-        ser.close()
-        ser.open()
-        serial_line = ser.readline().strip()
-        print serial_line
 
     while True:
         for event in pygame.event.get():
             if event.type is pygame.KEYDOWN and (event.key == pygame.K_RETURN and (event.mod & (pygame.KMOD_LALT | pygame.KMOD_RALT)) != 0):
-                toggle_fullscreen()
+                toggle_full_screen()
                 pygame.display.flip()
-            if event.type == pygame.QUIT:
-                return
-            elif event.type == pygame.KEYDOWN and event.key in [pygame.K_ESCAPE, pygame.K_q]:
+            elif event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key in [pygame.K_ESCAPE, pygame.K_q]):
+                if config["process"] == "serial":
+                    ser.close()
                 return
 
         if config["process"] == "serial":
