@@ -14,8 +14,8 @@ screensize = [0, 0]
 cursor_pos = [0, 0]
 screen = False
 cursor_size = 5
-yreads = []
-last_y_avg = 0
+zreads = []
+last_z_avg = 0
 
 
 def pixel(surface, color, pos):
@@ -101,7 +101,7 @@ def project_a_sketch(pressed):
 
 
 def run_game_loop():
-    global use_serial, last_y_avg, yreads
+    global use_serial, last_z_avg, zreads
     pygame.display.flip()
     if config["process"] == "serial":
         ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"])
@@ -149,18 +149,18 @@ def run_game_loop():
                 pressed[pygame.K_RIGHT] = 1
             else:
                 x,y,z = serial_line.split()
-                ypos = int(y.split(":")[1])
-                yreads.append(ypos)
-                if len(yreads) > config['shake']['reads']:
-                    yreads.pop(0)
+                zpos = int(y.split(":")[1])
+                zreads.append(zpos)
+                if len(zreads) > config['shake']['reads']:
+                    zreads.pop(0)
 
-                if len(yreads) == config['shake']['reads']:
-                    avg = sum(yreads) / config['shake']['reads']
-                    if last_y_avg == 0:
-                        last_y_avg = avg
-                    elif avg <= (last_y_avg - config['shake']['threshold']) | avg >= (last_y_avg + config['shake']['threshold']):
+                if len(zreads) == config['shake']['reads']:
+                    avg = sum(zreads) / config['shake']['reads']
+                    if last_z_avg == 0:
+                        last_z_avg = avg
+                    elif avg <= (last_z_avg - config['shake']['threshold']) | avg >= (last_z_avg + config['shake']['threshold']):
                         pressed[pygame.K_s] = 1
-                        last_y_avg = avg
+                        last_z_avg = avg
 
             project_a_sketch(pressed)
             pygame.time.wait(10)
