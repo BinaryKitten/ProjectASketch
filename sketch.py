@@ -3,6 +3,7 @@ import serial
 import pygame
 import random
 import json
+import sys
 
 json_data = open('./config.json')
 config = json.load(json_data)
@@ -194,6 +195,8 @@ def main():
     pygame.event.set_allowed(pygame.KEYDOWN)
     screen.fill((255, 255, 255))
     run_game_loop()
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()
