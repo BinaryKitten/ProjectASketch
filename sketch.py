@@ -59,28 +59,21 @@ def project_a_sketch(pressed):
     render_pixel = False
     render_shake = False
 
-    if 1 == pressed[pygame.K_DOWN]:
-        if cursor_pos[1] < screensize[1] - cursor_size:
-            render_pixel = True
-            cursor_pos[1] += cursor_size
+    if 1 == pressed[pygame.K_DOWN] and cursor_pos[1] < screensize[1] - cursor_size:
+        render_pixel = True
+        cursor_pos[1] += cursor_size
 
-    if 1 == pressed[pygame.K_UP]:
+    if 1 == pressed[pygame.K_UP] and cursor_pos[1] > 0:
         cursor_pos[1] -= cursor_size
         render_pixel = True
-        if cursor_pos[1] < 0:
-            cursor_pos[1] = 0
 
-    if 1 == pressed[pygame.K_LEFT]:
+    if 1 == pressed[pygame.K_LEFT] and cursor_pos[0] > 0:
         cursor_pos[0] -= cursor_size
         render_pixel = True
-        if cursor_pos[0] < 0:
-            cursor_pos[0] = 0
 
-    if 1 == pressed[pygame.K_RIGHT]:
+    if 1 == pressed[pygame.K_RIGHT] and cursor_pos[0] < screensize[0] - cursor_size:
         cursor_pos[0] += cursor_size
         render_pixel = True
-        if cursor_pos[0] >= screensize[0] - cursor_size:
-            cursor_pos[0] = screensize[0] - cursor_size
 
     if 1 == pressed[pygame.K_s]:
         shake_surface = pygame.Surface((screensize[0], screensize[1]))
