@@ -185,6 +185,7 @@ def setup_screen():
     cursor_pos = [screensize[0] / 2, screensize[1] / 2]
     screen.fill((255, 255, 255))
 
+
 def setup_cursor():
     pass
 
@@ -200,7 +201,7 @@ def main():
     setup_screen()
 
     print "Project a Sketch - Setting only Key Down and Quit as allowed events"
-    pygame.event.set_allowed(pygame.KEYDOWN, pygame.QUIT)
+    pygame.event.set_allowed([pygame.KEYDOWN, pygame.QUIT])
     print "Project a Sketch - Starting Sketch"
     run_game_loop()
 
