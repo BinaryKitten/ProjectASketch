@@ -124,6 +124,9 @@ def run_game_loop():
             # build using the standard keys
             serial_line = ser.readline().strip()
 
+            if not serial_line:
+                pass
+
             pressed = {
                 pygame.K_UP: 0,
                 pygame.K_DOWN: 0,
@@ -132,10 +135,7 @@ def run_game_loop():
                 pygame.K_s: 0
             }
 
-            if not serial_line:
-                pass
-
-            elif serial_line == 'u':
+            if serial_line == 'u':
                 pressed[pygame.K_UP] = 1
 
             elif serial_line == 'd':
@@ -158,8 +158,10 @@ def run_game_loop():
                     if z_pos not in range(z_avg - config['shake']['threshold'], z_avg + config['shake']['threshold']):
                         pressed[pygame.K_s] = 1
 
-            project_a_sketch(pressed)
-            pygame.time.wait(10)
+            if 1 in pressed:
+                project_a_sketch(pressed)
+                pygame.time.wait(10)
+                ser.flushInput()
 
         elif config["process"] == "random":
             pressed = {
