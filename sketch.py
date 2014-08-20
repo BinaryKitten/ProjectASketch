@@ -98,6 +98,10 @@ def run_game_loop():
     pygame.display.flip()
     if config["process"] == "serial":
         ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"])
+        ser.setDTR(False)
+        pygame.time.wait(100)
+        ser.flushInput()
+        ser.setDTR(True)
 
     while True:
         for event in pygame.event.get():
@@ -115,7 +119,9 @@ def run_game_loop():
             serial_line = ser.readline().strip()
 
             if not serial_line:
-                pass
+                continue
+
+            sys.stderr.write("%s\n" % serial_line)
 
             pressed = {
                 pygame.K_UP: 0,
@@ -127,18 +133,15 @@ def run_game_loop():
 
             if serial_line == 'u':
                 pressed[pygame.K_UP] = 1
-
             elif serial_line == 'd':
                 pressed[pygame.K_DOWN] = 1
-
             elif serial_line == 'l':
                 pressed[pygame.K_LEFT] = 1
-
             elif serial_line == 'r':
                 pressed[pygame.K_RIGHT] = 1
-            else:
+            elif serial_line[0] == 'X':
                 x, y, z = serial_line.split()
-                letter_z, z_pos = z.split(":")
+                letter_z, z_pos = y.split(":")
                 z_pos = int(z_pos)
                 if len(zreads) < config['shake']['reads']:
                     zreads.append(z_pos)
@@ -148,7 +151,8 @@ def run_game_loop():
                     if z_pos not in range(z_avg - config['shake']['threshold'], z_avg + config['shake']['threshold']):
                         pressed[pygame.K_s] = 1
 
-            if 1 in pressed:
+            if any(t==1 for t in pressed.itervalues()):
+                sys.stderr.write("%s\n" % pressed)
                 project_a_sketch(pressed)
                 pygame.time.wait(10)
                 ser.flushInput()
