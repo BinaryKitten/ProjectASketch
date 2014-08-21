@@ -60,20 +60,20 @@ def project_a_sketch(pressed):
     render_pixel = False
     render_shake = False
 
-    if 1 == pressed[pygame.K_DOWN] and cursor_pos[1] < screensize[1] - cursor_size:
+    if 1 == pressed[pygame.K_DOWN] and cursor_pos[1] < screensize[1] - cursor_size[pygame.K_UP]:
         render_pixel = True
-        cursor_pos[1] += cursor_size
+        cursor_pos[1] += cursor_size[pygame.K_UP]
 
     if 1 == pressed[pygame.K_UP] and cursor_pos[1] > 0:
-        cursor_pos[1] -= cursor_size
+        cursor_pos[1] -= cursor_size[pygame.K_UP]
         render_pixel = True
 
     if 1 == pressed[pygame.K_LEFT] and cursor_pos[0] > 0:
-        cursor_pos[0] -= cursor_size
+        cursor_pos[0] -= cursor_size[pygame.K_LEFT]
         render_pixel = True
 
-    if 1 == pressed[pygame.K_RIGHT] and cursor_pos[0] < screensize[0] - cursor_size:
-        cursor_pos[0] += cursor_size
+    if 1 == pressed[pygame.K_RIGHT] and cursor_pos[0] < screensize[0] - cursor_size[pygame.K_LEFT]:
+        cursor_pos[0] += cursor_size[pygame.K_LEFT]
         render_pixel = True
 
     if 1 == pressed[pygame.K_s]:
@@ -191,7 +191,17 @@ def setup_screen():
 
 
 def setup_cursor():
-    pass
+    global cursor_size
+    if config["cursor"]["style"] == "square":
+        cursor_size = {
+            pygame.K_UP: int(config["cursor"]["height"] / 2),
+            pygame.K_LEFT: int(config["cursor"]["width"] / 2)
+        }
+    elif config["cursor"]["style"] == "circle":
+        cursor_size = {
+            pygame.K_UP: int(config["cursor"]["height"] / 2),
+            pygame.K_LEFT: int(config["cursor"]["width"] / 2)
+        }
 
 
 def main():
