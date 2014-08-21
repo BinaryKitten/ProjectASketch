@@ -15,8 +15,8 @@ screensize = [0, 0]
 cursor_pos = [0, 0]
 screen = False
 cursor_size = 5
-zreads = []
-z_avg = 0
+shake_reads = []
+shake_avg = 0
 
 
 def pixel(surface, color, pos):
@@ -94,7 +94,7 @@ def project_a_sketch(pressed):
 
 
 def run_game_loop():
-    global use_serial, z_avg, zreads
+    global use_serial, shake_avg, shake_reads
     pygame.display.flip()
     if config["process"] == "serial":
         ser = serial.Serial(config["serial"]["port"], config["serial"]["baud"])
@@ -121,7 +121,7 @@ def run_game_loop():
             if not serial_line:
                 continue
 
-            sys.stderr.write("%s\n" % serial_line)
+            # sys.stderr.write("%s\n" % serial_line)
 
             pressed = {
                 pygame.K_UP: 0,
@@ -141,18 +141,18 @@ def run_game_loop():
                 pressed[pygame.K_RIGHT] = 1
             elif serial_line[0] == 'X':
                 x, y, z = serial_line.split()
-                letter_z, z_pos = y.split(":")
-                z_pos = int(z_pos)
-                if len(zreads) < config['shake']['reads']:
-                    zreads.append(z_pos)
+                letter_z, shake_axis_pos = y.split(":")
+                shake_axis_pos = int(shake_axis_pos)
+                if len(shake_reads) < config['shake']['reads']:
+                    shake_reads.append(shake_axis_pos)
                 else:
-                    z_avg = sum(zreads) / config['shake']['reads']
+                    shake_avg = sum(shake_reads) / config['shake']['reads']
 
-                    if z_pos not in range(z_avg - config['shake']['threshold'], z_avg + config['shake']['threshold']):
+                    if shake_axis_pos not in range(shake_avg - config['shake']['threshold'], shake_avg + config['shake']['threshold']):
                         pressed[pygame.K_s] = 1
 
             if any(t==1 for t in pressed.itervalues()):
-                sys.stderr.write("%s\n" % pressed)
+                # sys.stderr.write("%s\n" % pressed)
                 project_a_sketch(pressed)
                 pygame.time.wait(10)
                 ser.flushInput()
@@ -196,21 +196,24 @@ def setup_cursor():
 
 def main():
     global font, screen
-    sys.stderr.write("Project a Sketch - Start up")
+    sys.stderr.write("Project a Sketch - Start up\n")
     pygame.init()
     pygame.mouse.set_visible(False)
     pygame.font.init()
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
 
-    sys.stderr.write("Project a Sketch - Setting Screen")
+    sys.stderr.write("Project a Sketch - Setting Screen\n")
     setup_screen()
 
-    sys.stderr.write("Project a Sketch - Setting only Key Down and Quit as allowed events")
+    sys.stderr.write("Project a Sketch - Setting Cursor\n")
+    setup_cursor()
+
+    sys.stderr.write("Project a Sketch - Setting only Key Down and Quit as allowed events\n")
     pygame.event.set_allowed([pygame.KEYDOWN, pygame.QUIT])
-    sys.stderr.write("Project a Sketch - Starting Sketch")
+    sys.stderr.write("Project a Sketch - Starting Sketch\n")
     run_game_loop()
 
-    sys.stderr.write("Project a Sketch - Exiting System")
+    sys.stderr.write("Project a Sketch - Exiting System\n")
     pygame.quit()
     sys.exit()
 
